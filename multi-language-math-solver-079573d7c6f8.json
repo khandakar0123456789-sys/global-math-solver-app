@@ -1,0 +1,13 @@
+
+  "type": "service_account",
+  "project_id": "multi-language-math-solver",
+  "private_key_id": "079573d7c6f88471e6a587fd3c2d583f791c4194",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCgY7Hgs3LWstTP\njlEA5c7K78s4/lxz+afUy6pspbEbpifFGL2bAh2dzt1NbJ2cEpiW5TLVeaLBsN+W\njrVh534iZB588eFWZSLT99KdP3mcJ9HcQFuvgzObDGvWkAaUpAEk0yFh+x9VaACE\ndu/phguF0ixN0nECsXVxsHjFKHaDxq0FCDbanP7E3FcXt1F2PeLFpeJiAn4+i/7c\n3NhVLLz3ft62IU7HmCaaIjMm+V0q38MAGrCp6AwHq0aXw32BQYL+QXCT22FLn84T\nKHbRLSr4pxbLm++wrZs+X6M8o48TIcuh9Azk6C7Yc/tmaMfPfPqFiziL+yxA7Nsx\nLd3WRWw3AgMBAAECggEATa9cFcj1I5akyw9Unsmweszgsu9I2oeeycwH9O3gNdMp\nyiZsl+rTa38p43lrcY/0RoonMAzlT0mbUnI22n/ksUWrGruReGYuE1sisTVwcrk6\nxaKKhh1XXo8KoHdMKKyzPSHiNnIKwDRKo95z37kkVaHyAZOfVz2a9AEUzfIGTVam\nCo6b3MZ/Eoz+ORs1URxf0730lOVlg0epm+qfOQ6IB+YsHETyKfjnJD9MphsxlS+h\nQgUD/JDsjGctmpnAswvVK0gotzdwR4F4Six/pPeNFeONt6egwbsM6muLmf78PDFM\niwAD6dhNK5PJA4TLxOO3N0PRrxim3UP2gtbV/15d0QKBgQDXOqeMeI6l1A0aEcJl\n8vSEW8HjKgxGlFAYNZsKHpY+MaVv161bYwjASfYVN3Wr/tAJiANA6zdPW68DC0YK\n9iUX2YkkjuZW6OhN18HksXRcDHtN5vztIC62k5qMUnIk0wY8MfWcmqDhq3SYflx/\nNXHUjCZbg7DTiRE1wnbmnGjCnwKBgQC+xaNqDinVWPD5ohyDu5jpgXtYi5HGhuSL\nVt+l6Hl4KhGQVY2RrDLvp636CTnm5YRk2So8RVUaqgDw/dRVuLaGx82UdD/xMRSF\niJDrnWr3egqTwrrtS3RpcRAPN3cFLFg7090PKtDtONx6Lc09LS5uTJkTPIPhhYTj\nIStNJXzHaQKBgERwumbIz1OcIq5vh0m0AF02cGk0LcMj1nRcV3jYUR5l2x29j7rH\nuziqTD5i7GBNHwpo3d/+7A+oL/bf1t4Vd6Yl3p5pcoWgen6GZXm7lCzRK0SSd0tQ\nOIqGVVbZwMJE+G6b1GaAJTidtO3pALDS5eeYyXnAXrJlm7tkozqh8g4xAoGARNNQ\n7YZGmW4JIkbWOsCHnlbUhVF1OkaYVZz1+wkwKaYjyArVlGSny8aXAcoqVZ8gcLHY\nhv4Mgh4rUMaCwJpvX5jeFl0KZJ3sZXCruBWG7dndzwlGHy5FxXTA8nx0OC2Td6Ir\n8rjjv3HwOTQlA5k1Ux3XbBU9DzP4iWkCEkcgCWECgYBfXF5A1xl1yVUsSiQdsWo/\nJ7uDTnAGiXBdaQJaTVjUeEMmgb0Un2OfykSbll2dtKRUd409ccMj7joW4wXZuuO+\ncj9t3dTGRw5f3gWE+kh0TDC8QYDCs7aEPt3uiUg2YihyK/epKbNcs83IQJyhXUeD\n4TjtHFv7OLy/TSkud2x75A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "math-solver-backend@multi-language-math-solver.iam.gserviceaccount.com",
+  "client_id": "107295181665984690924",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/math-solver-backend%40multi-language-math-solver.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
