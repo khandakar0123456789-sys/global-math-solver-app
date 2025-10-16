@@ -8,21 +8,20 @@ const { VertexAI } = require('@google-cloud/vertexai');
 // Initialize Firebase Admin SDK (required for token verification and auth)
 admin.initializeApp();
 
-// Initialize VertexAI client
-// Vertex AI will automatically use the credentials of the Cloud Function environment.
-const PROJECT_ID = process.env.GCLOUD_PROJECT;
-// NOTE: Please change the region to your desired deployment region (e.g., 'asia-south1' for India)
-const REGION = 'us-central1'; 
-
-if (!PROJECT_ID) {
-    console.error("GCLOUD_PROJECT environment variable not set.");
-}
-
-const vertex_ai = new VertexAI({ 
-    project: PROJECT_ID, 
-    location: REGION 
+// Key ব্যবহার করে Firebase Admin SDK ইনিশিয়ালাইজ করা হচ্ছে:
+const serviceAccount = require('../multi-language-math-solver-079573d7c6f8.json'); 
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount) 
 });
 
+// Vertex AI ইনিশিয়ালাইজ করার জন্য Project ID এবং Region সংজ্ঞায়িত করুন:
+const PROJECT_ID = 'multi-language-math-solv-82224'; 
+const REGION = 'asia-south1'; 
+
+const vertex_ai = new VertexAI({
+  project: PROJECT_ID,
+  location: REGION
+});
 const MODEL_NAME = 'gemini-2.5-flash';
 // Marker must match the one in the React app
 const UNCLARITY_MARKER = "[UNCLEAR_MATH_INPUT]";
