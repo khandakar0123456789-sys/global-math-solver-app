@@ -2,81 +2,334 @@
 <html>
 <head>
     <title>Global Math Solver App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            padding: 20px; 
-            max-width: 600px; 
-            margin: auto; 
-            background-color: #f4f4f4;
+        @keyframes pulse-glow-language-prompt {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4), 0 0 10px rgba(99, 102, 241, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(129, 140, 248, 0.6), 0 0 16px rgba(129, 140, 248, 0.9);
+            }
         }
-        h1 { color: #333; }
-        textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; }
-        button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
-        #output { 
-            border: 2px solid #5cb85c; 
-            padding: 15px; 
-            min-height: 100px; 
-            margin-top: 20px; 
-            background-color: #e6ffe6;
+        .language-glow-prompt {
+            animation: pulse-glow-language-prompt 2.5s infinite ease-in-out;
+        }
+        .scroll-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            white-space: pre-wrap; /* Preserve line breaks */
+            word-wrap: break-word; /* Break long words */
+        }
+        .scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background-color: #A5B4FC;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 sm:p-8 font-sans">
 
-    <h1>AI Multi-Language Math Solver</h1>
-    <textarea id="mathInput" placeholder="আপনার গণিত সমস্যা এখানে লিখুন (যেমন: ৫+৫ কত?)।" rows="4"></textarea>
-    <button onclick="solveProblem()">সমাধান করুন</button>
-    
-    <h3>ফলাফল:</h3>
-    <div id="output">উত্তর এখানে আসবে...</div>
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-indigo-800 mb-2 drop-shadow-md">AI Math Solver</h1>
+            <p class="text-xl text-gray-600">Solve complex math problems in your preferred, easy-to-understand way.</p>
+
+            <div class="mt-4 flex justify-center items-center space-x-4">
+                <p class="text-base text-gray-500 font-medium bg-white px-4 py-2 rounded-full shadow-md border border-gray-300">
+                    Authentication feature is currently disabled.
+                </p>
+                <button 
+                    onclick="alert('Log In/Sign Up feature is currently disabled on this simplified version.')" 
+                    class="text-base text-white bg-green-500 hover:bg-green-600 px-6 py-2 rounded-xl transition duration-200 shadow-lg"
+                >
+                    Log In / Sign Up
+                </button>
+            </div>
+        </header>
+
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl border border-indigo-200/50">
+            <div class="space-y-6">
+
+                <div id="language-prompt" class="p-4 bg-indigo-50 rounded-2xl shadow-lg shadow-indigo-200/50 border border-indigo-300 transition duration-300 language-glow-prompt">
+                    <label for="outputLanguage" class="block text-lg font-medium text-gray-800 mb-2">
+                        1. Select Output Language:
+                    </label>
+                    <select
+                        id="outputLanguage"
+                        onchange="document.getElementById('language-prompt').classList.remove('language-glow-prompt')"
+                        class="w-full p-3 border border-indigo-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 text-base"
+                    >
+                        <option value="Auto-Detect">Auto-Detect</option>
+                        <option value="English">English</option>
+                        <option value="Afrikaans">Afrikaans</option>
+                        <option value="Albanian">Albanian</option>
+                        <option value="Amharic">Amharic</option>
+                        <option value="Arabic">Arabic (العربية)</option>
+                        <option value="Armenian">Armenian</option>
+                        <option value="Assamese">Assamese</option>
+                        <option value="Aymara">Aymara</option>
+                        <option value="Azerbaijani">Azerbaijani</option>
+                        <option value="Bambara">Bambara</option>
+                        <option value="Basque">Basque</option>
+                        <option value="Belarusian">Belarusian</option>
+                        <option value="Bengali">Bengali (Bangla)</option>
+                        <option value="Bhojpuri">Bhojpuri</option>
+                        <option value="Bosnian">Bosnian</option>
+                        <option value="Bulgarian">Bulgarian</option>
+                        <option value="Burmese">Burmese</option>
+                        <option value="Catalan">Catalan</option>
+                        <option value="Cebuano">Cebuano</option>
+                        <option value="Chichewa">Chichewa</option>
+                        <option value="Chinese (Simplified)">Chinese (Simplified) (简体中文)</option>
+                        <option value="Chinese (Traditional)">Chinese (Traditional) (繁體中文)</option>
+                        <option value="Corsican">Corsican</option>
+                        <option value="Croatian">Croatian</option>
+                        <option value="Czech">Czech</option>
+                        <option value="Danish">Danish</option>
+                        <option value="Dhivehi">Dhivehi</option>
+                        <option value="Dogri">Dogri</option>
+                        <option value="Dutch">Dutch (Nederlands)</option>
+                        <option value="Esperanto">Esperanto</option>
+                        <option value="Estonian">Estonian</option>
+                        <option value="Ewe">Ewe</option>
+                        <option value="Filipino">Filipino</option>
+                        <option value="Finnish">Finnish</option>
+                        <option value="French">French (Français)</option>
+                        <option value="Frisian">Frisian</option>
+                        <option value="Galician">Galician</option>
+                        <option value="Georgian">Georgian</option>
+                        <option value="German">German (Deutsch)</option>
+                        <option value="Greek">Greek (Ελληνικά)</option>
+                        <option value="Guarani">Guarani</option>
+                        <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+                        <option value="Haitian Creole">Haitian Creole</option>
+                        <option value="Hausa">Hausa</option>
+                        <option value="Hawaiian">Hawaiian</option>
+                        <option value="Hebrew">Hebrew (עברית)</option>
+                        <option value="Hindi">Hindi (हिन्दी)</option>
+                        <option value="Hmong">Hmong</option>
+                        <option value="Hungarian">Hungarian</option>
+                        <option value="Icelandic">Icelandic</option>
+                        <option value="Igbo">Igbo</option>
+                        <option value="Indonesian">Indonesian</option>
+                        <option value="Irish">Irish</option>
+                        <option value="Italian">Italian (Italiano)</option>
+                        <option value="Japanese">Japanese (日本語)</option>
+                        <option value="Javanese">Javanese</option>
+                        <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+                        <option value="Kazakh">Kazakh</option>
+                        <option value="Khmer">Khmer</option>
+                        <option value="Kinyarwanda">Kinyarwanda</option>
+                        <option value="Konkani">Konkani</option>
+                        <option value="Korean">Korean (한국어)</option>
+                        <option value="Krio">Krio</option>
+                        <option value="Kurdish">Kurdish</option>
+                        <option value="Kyrgyz">Kyrgyz</option>
+                        <option value="Lao">Lao</option>
+                        <option value="Latin">Latin</option>
+                        <option value="Latvian">Latvian</option>
+                        <option value="Lingala">Lingala</option>
+                        <option value="Lithuanian">Lithuanian</option>
+                        <option value="Luganda">Luganda</option>
+                        <option value="Luxembourgish">Luxembourgish</option>
+                        <option value="Macedonian">Macedonian</option>
+                        <option value="Maithili">Maithili</option>
+                        <option value="Malagasy">Malagasy</option>
+                        <option value="Malay">Malay</option>
+                        <option value="Malayalam">Malayalam (മലയാളം)</option>
+                        <option value="Maltese">Maltese</option>
+                        <option value="Maori">Maori</option>
+                        <option value="Marathi">Marathi (मराठी)</option>
+                        <option value="Mizo">Mizo</option>
+                        <option value="Mongolian">Mongolian</option>
+                        <option value="Nepali">Nepali (নেপালী)</option>
+                        <option value="Norwegian">Norwegian</option>
+                        <option value="Odia">Odia</option>
+                        <option value="Oromo">Oromo</option>
+                        <option value="Pashto">Pashto</option>
+                        <option value="Persian">Persian (فارسی)</option>
+                        <option value="Polish">Polish (Polski)</option>
+                        <option value="Portuguese">Portuguese (Português)</option>
+                        <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="Quechua">Quechua</option>
+                        <option value="Romanian">Romanian (Română)</option>
+                        <option value="Russian">Russian (Русский)</option>
+                        <option value="Samoan">Samoan</option>
+                        <option value="Sanskrit">Sanskrit</option>
+                        <option value="Scots Gaelic">Scots Gaelic</option>
+                        <option value="Sepedi">Sepedi</option>
+                        <option value="Serbian">Serbian</option>
+                        <option value="Sesotho">Sesotho</option>
+                        <option value="Shona">Shona</option>
+                        <option value="Sindhi">Sindhi</option>
+                        <option value="Sinhala">Sinhala</option>
+                        <option value="Slovak">Slovak</option>
+                        <option value="Slovenian">Slovenian</option>
+                        <option value="Somali">Somali</option>
+                        <option value="Spanish">Spanish (Español)</option>
+                        <option value="Sundanese">Sundanese</option>
+                        <option value="Swahili">Swahili</option>
+                        <option value="Swedish">Swedish (Svenska)</option>
+                        <option value="Tagalog (Filipino)">Tagalog (Filipino)</option>
+                        <option value="Tajik">Tajik</option>
+                        <option value="Tamil">Tamil (தமிழ்)</option>
+                        <option value="Tatar">Tatar</option>
+                        <option value="Telugu">Telugu (తెలుగు)</option>
+                        <option value="Thai">Thai (ไทย)</option>
+                        <option value="Tibetan">Tibetan</option>
+                        <option value="Tigrinya">Tigrinya</option>
+                        <option value="Tsonga">Tsonga</option>
+                        <option value="Turkish">Turkish (Türkçe)</option>
+                        <option value="Turkmen">Turkmen</option>
+                        <option value="Twi">Twi</option>
+                        <option value="Ukrainian">Ukrainian (Українська)</option>
+                        <option value="Urdu">Urdu (اردو)</option>
+                        <option value="Uyghur">Uyghur</option>
+                        <option value="Uzbek">Uzbek</option>
+                        <option value="Vietnamese">Vietnamese (Tiếng Việt)</option>
+                        <option value="Welsh">Welsh</option>
+                        <option value="Xhosa">Xhosa</option>
+                        <option value="Yiddish">Yiddish</option>
+                        <option value="Yoruba">Yoruba</option>
+                        <option value="Zulu">Zulu</option>
+                    </select>
+                </div>
+
+                <div class="space-y-4">
+                    <label for="mathInput" class="block text-lg font-medium text-gray-800">
+                        2. Enter Math Problem or Upload Image/PDF
+                    </label>
+                    <textarea
+                        id="mathInput"
+                        rows="5"
+                        placeholder="Type your math problem here (e.g., 5+5?)."
+                        class="w-full p-4 border border-gray-300 rounded-lg shadow-inner focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 text-base"
+                    ></textarea>
+
+                    <div class="flex flex-wrap gap-3">
+                        <button
+                            onclick="setModeAndSolve('solve')"
+                            class="flex-1 min-w-[150px] py-3 px-6 rounded-xl text-white font-bold bg-indigo-600 hover:bg-indigo-700 transition duration-200 shadow-lg disabled:opacity-50"
+                            id="solveButton"
+                        >
+                            Solve Problem
+                        </button>
+                        <button
+                            onclick="alert('File Upload requires the original complex code setup. Please type your problem for now.')"
+                            class="flex-1 min-w-[100px] py-3 px-6 rounded-xl text-gray-800 font-semibold bg-gray-200 hover:bg-gray-300 transition duration-200 shadow-lg disabled:opacity-50"
+                        >
+                            Upload File
+                        </button>
+                    </div>
+                    <div id="loadingStatus" class="hidden text-center text-indigo-600 font-medium mt-2">
+                        Processing... Please wait.
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-2xl font-semibold text-indigo-700 border-b pb-2">3. Solution</h2>
+
+                    <div id="output" class="scroll-container bg-gray-50 border border-gray-300 text-gray-800">
+                        Solution will appear here...
+                    </div>
+
+                    <button
+                        onclick="setModeAndSolve('explain')"
+                        class="py-2 px-4 rounded-lg text-sm text-white bg-purple-500 hover:bg-purple-600 transition duration-200 shadow-md disabled:opacity-50"
+                        id="explainButton"
+                    >
+                        Get Easier Explanation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // ***গুরুত্বপূর্ণ: আপনাকে এখানে আপনার Gemini API Key বসাতে হবে।***
-        // এই Key টি উন্মুক্ত থাকবে, আপনি বলেছিলেন যে তাতে সমস্যা নেই।
-        const GEMINI_API_KEY = "AIzaSyBoKhnvyhOeaY3BLOilcSrDgzMvYc2KB5U"; 
+        // *** WARNING: REPLACE "YOUR-API-KEY-GOES-HERE" WITH YOUR ACTUAL API KEY ***
+        const GEMINI_API_KEY = "AIzaSyBoKhnvyhOeaY3BLOilcSrDgzMvYc2KB5U"; // আপনার আসল API Key এখানে বসান
+        let currentProblem = ""; // মূল সমস্যাটি Explanation এর জন্য সংরক্ষণের জন্য
 
-        async function solveProblem() {
+        const setModeAndSolve = (mode) => {
+            if (mode === 'solve') {
+                solveProblem(false);
+            } else if (mode === 'explain') {
+                solveProblem(true);
+            }
+        }
+
+        async function solveProblem(isExplainMode) {
             const input = document.getElementById('mathInput').value;
             const outputDiv = document.getElementById('output');
-            
-            if (!input) {
-                outputDiv.innerText = "দয়া করে একটি গণিত সমস্যা লিখুন।";
+            const languageSelect = document.getElementById('outputLanguage');
+            const outputLanguage = languageSelect.value;
+            const solveButton = document.getElementById('solveButton');
+            const explainButton = document.getElementById('explainButton');
+            const loadingStatus = document.getElementById('loadingStatus');
+
+            if (!input && !isExplainMode) {
+                alert("Please enter a math problem to solve.");
                 return;
             }
 
-            outputDiv.innerHTML = 'সমাধান হচ্ছে... ⏳';
+            // যদি Explanation মোড হয় এবং কোনো সমস্যা সমাধান করা না হয়ে থাকে
+            if (isExplainMode && !currentProblem) {
+                alert("Please solve the initial problem first!");
+                return;
+            }
 
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-            
-            const payload = {
-                contents: [{
-                    parts: [{
-                        text: `Solve the following math problem in the language it was given: ${input}`
-                    }]
-                }]
-            };
+            // বাটনগুলি অক্ষম (Disable) করা এবং লোডিং স্ট্যাটাস দেখানো
+            solveButton.disabled = true;
+            explainButton.disabled = true;
+            loadingStatus.classList.remove('hidden');
+            outputDiv.innerHTML = isExplainMode
+                ? "Generating easier explanation..."
+                : "Solving problem...";
+
+            // Solve মোডে থাকলে, বর্তমান সমস্যাটি সংরক্ষণ করা
+            if (!isExplainMode) {
+                currentProblem = input;
+            }
+
+
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+            const prompt = isExplainMode
+                ? `You are an excellent teacher. Simplify the solution for the math problem: "${currentProblem}" (Problem solved previously). Provide the explanation in a simple, step-by-step manner for a middle school student. Respond in ${outputLanguage} language.`
+                : `You are a world-class math solver. Solve the following problem: "${input}". Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
 
             try {
-                const response = await fetch(url, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    }),
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`API Error: ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                
-                const answer = data.candidates[0].content.parts[0].text;
-                outputDiv.innerHTML = `<strong>সমস্যা:</strong> ${input}<br><br><strong>সমাধান:</strong> ${answer}`;
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate a response. Please check your API key or input.";
+
+                outputDiv.innerHTML = text;
 
             } catch (error) {
-                outputDiv.innerText = 'ত্রুটি: সমাধান খুঁজে পাওয়া যায়নি। আপনার API Key সঠিক কিনা দেখুন। ' + error.message;
+                console.error("Error calling Gemini API:", error);
+                outputDiv.innerHTML = `Error: ${error.message}. Please check console for details.`;
+            } finally {
+                solveButton.disabled = false;
+                explainButton.disabled = false;
+                loadingStatus.classList.add('hidden');
             }
         }
     </script>
