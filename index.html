@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Global Math Solver App</title>
+    <title>Global Math Solver App with File Upload</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -22,8 +22,8 @@
             overflow-y: auto;
             border-radius: 0.75rem;
             padding: 1rem;
-            white-space: pre-wrap; /* Preserve line breaks */
-            word-wrap: break-word; /* Break long words */
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         .scroll-container::-webkit-scrollbar {
             width: 8px;
@@ -39,19 +39,7 @@
     <div class="max-w-4xl mx-auto">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-extrabold text-indigo-800 mb-2 drop-shadow-md">AI Math Solver</h1>
-            <p class="text-xl text-gray-600">Solve complex math problems in your preferred, easy-to-understand way.</p>
-
-            <div class="mt-4 flex justify-center items-center space-x-4">
-                <p class="text-base text-gray-500 font-medium bg-white px-4 py-2 rounded-full shadow-md border border-gray-300">
-                    Authentication feature is currently disabled.
-                </p>
-                <button 
-                    onclick="alert('Log In/Sign Up feature is currently disabled on this simplified version.')" 
-                    class="text-base text-white bg-green-500 hover:bg-green-600 px-6 py-2 rounded-xl transition duration-200 shadow-lg"
-                >
-                    Log In / Sign Up
-                </button>
-            </div>
+            <p class="text-xl text-gray-600">Solve complex math problems with text or image in your preferred language.</p>
         </header>
 
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl border border-indigo-200/50">
@@ -204,7 +192,7 @@
 
                 <div class="space-y-4">
                     <label for="mathInput" class="block text-lg font-medium text-gray-800">
-                        2. Enter Math Problem or Upload Image/PDF
+                        2. Enter Math Problem or Upload Image
                     </label>
                     <textarea
                         id="mathInput"
@@ -213,6 +201,22 @@
                         class="w-full p-4 border border-gray-300 rounded-lg shadow-inner focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 text-base"
                     ></textarea>
 
+                    <div id="fileUploadContainer" class="p-3 border border-dashed border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100 transition duration-150 text-center">
+                        <label for="fileInput" class="cursor-pointer text-indigo-600 font-medium block">
+                            Click here to Upload Image (or PDF)
+                        </label>
+                        <input type="file" id="fileInput" accept="image/*,application/pdf" class="hidden">
+                        <p id="fileNameDisplay" class="text-sm text-gray-500 mt-1">No file selected.</p>
+                        <button
+                            onclick="clearFile()"
+                            class="text-xs text-red-500 hover:text-red-700 mt-1 disabled:opacity-50"
+                            id="clearFileButton"
+                            disabled
+                        >
+                            Clear File
+                        </button>
+                    </div>
+
                     <div class="flex flex-wrap gap-3">
                         <button
                             onclick="setModeAndSolve('solve')"
@@ -220,12 +224,6 @@
                             id="solveButton"
                         >
                             Solve Problem
-                        </button>
-                        <button
-                            onclick="alert('File Upload requires the original complex code setup. Please type your problem for now.')"
-                            class="flex-1 min-w-[100px] py-3 px-6 rounded-xl text-gray-800 font-semibold bg-gray-200 hover:bg-gray-300 transition duration-200 shadow-lg disabled:opacity-50"
-                        >
-                            Upload File
                         </button>
                     </div>
                     <div id="loadingStatus" class="hidden text-center text-indigo-600 font-medium mt-2">
@@ -254,8 +252,59 @@
 
     <script>
         // *** WARNING: REPLACE "YOUR-API-KEY-GOES-HERE" WITH YOUR ACTUAL API KEY ***
-        const GEMINI_API_KEY = "AIzaSyBoKhnvyhOeaY3BLOilcSrDgzMvYc2KB5U"; // আপনার আসল API Key এখানে বসান
-        let currentProblem = ""; // মূল সমস্যাটি Explanation এর জন্য সংরক্ষণের জন্য
+        const GEMINI_API_KEY = "AIzaSyBoKhnvyhOeaY3BLOilcSrDgzMvYc2KB5U"; // <--- আপনার API Key এখানে বসান
+        let currentProblem = "";
+        let uploadedFile = null;
+
+        // --- File Handling Functions ---
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const clearFileButton = document.getElementById('clearFileButton');
+
+            if (file) {
+                if (file.size > 4 * 1024 * 1024) { // 4MB limit
+                    alert("File size exceeds the 4MB limit for simple upload. Please choose a smaller image or type the question.");
+                    clearFile();
+                    return;
+                }
+
+                uploadedFile = file;
+                fileNameDisplay.textContent = 'File selected: ' + file.name;
+                clearFileButton.disabled = false;
+                document.getElementById('mathInput').value = 'Please solve the problem in the attached file.';
+            } else {
+                clearFile();
+            }
+        });
+
+        function clearFile() {
+            uploadedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileNameDisplay').textContent = 'No file selected.';
+            document.getElementById('clearFileButton').disabled = true;
+            document.getElementById('mathInput').value = '';
+        }
+
+        // Converts the file to a Base64 string for the API
+        function fileToGenerativePart(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64Data = e.target.result.split(',')[1];
+                    resolve({
+                        inlineData: {
+                            data: base64Data,
+                            mimeType: file.type
+                        },
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- Solve and Explain Functions ---
 
         const setModeAndSolve = (mode) => {
             if (mode === 'solve') {
@@ -266,7 +315,7 @@
         }
 
         async function solveProblem(isExplainMode) {
-            const input = document.getElementById('mathInput').value;
+            const input = document.getElementById('mathInput').value.trim();
             const outputDiv = document.getElementById('output');
             const languageSelect = document.getElementById('outputLanguage');
             const outputLanguage = languageSelect.value;
@@ -274,18 +323,17 @@
             const explainButton = document.getElementById('explainButton');
             const loadingStatus = document.getElementById('loadingStatus');
 
-            if (!input && !isExplainMode) {
-                alert("Please enter a math problem to solve.");
+            if (!input && !uploadedFile && !isExplainMode) {
+                alert("Please enter a math problem or upload an image to solve.");
                 return;
             }
 
-            // যদি Explanation মোড হয় এবং কোনো সমস্যা সমাধান করা না হয়ে থাকে
             if (isExplainMode && !currentProblem) {
                 alert("Please solve the initial problem first!");
                 return;
             }
 
-            // বাটনগুলি অক্ষম (Disable) করা এবং লোডিং স্ট্যাটাস দেখানো
+            // UI Disable/Enable
             solveButton.disabled = true;
             explainButton.disabled = true;
             loadingStatus.classList.remove('hidden');
@@ -293,25 +341,45 @@
                 ? "Generating easier explanation..."
                 : "Solving problem...";
 
-            // Solve মোডে থাকলে, বর্তমান সমস্যাটি সংরক্ষণ করা
-            if (!isExplainMode) {
-                currentProblem = input;
+            // Constructing Prompt and Content
+            let prompt = "";
+            let contents = [];
+
+            if (isExplainMode) {
+                prompt = `You are an excellent teacher. Simplify the solution for the math problem: "${currentProblem}" (Problem solved previously). Provide the explanation in a simple, step-by-step manner for a middle school student. Respond in ${outputLanguage} language.`;
+                contents = [{ role: "user", parts: [{ text: prompt }] }];
+            } else {
+                // Solve Mode with or without file
+                currentProblem = input; // Save problem text for explanation
+
+                if (uploadedFile) {
+                    currentProblem = `Problem from uploaded file: ${uploadedFile.name}`; // Update for explanation mode
+                    prompt = `You are a world-class math solver. Solve the math problem shown in the attached image/file. Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
+
+                    try {
+                        const imagePart = await fileToGenerativePart(uploadedFile);
+                        contents = [{ role: "user", parts: [imagePart, { text: prompt }] }];
+                    } catch (e) {
+                        outputDiv.innerHTML = `Error: Could not process file. Please try a different file or type your problem.`;
+                        solveButton.disabled = false;
+                        explainButton.disabled = false;
+                        loadingStatus.classList.add('hidden');
+                        return;
+                    }
+
+                } else {
+                    prompt = `You are a world-class math solver. Solve the following problem: "${input}". Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
+                    contents = [{ role: "user", parts: [{ text: prompt }] }];
+                }
             }
 
-
             const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-            const prompt = isExplainMode
-                ? `You are an excellent teacher. Simplify the solution for the math problem: "${currentProblem}" (Problem solved previously). Provide the explanation in a simple, step-by-step manner for a middle school student. Respond in ${outputLanguage} language.`
-                : `You are a world-class math solver. Solve the following problem: "${input}". Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    }),
+                    body: JSON.stringify({ contents: contents }),
                 });
 
                 if (!response.ok) {
@@ -325,7 +393,7 @@
 
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
-                outputDiv.innerHTML = `Error: ${error.message}. Please check console for details.`;
+                outputDiv.innerHTML = `Error: ${error.message}. Please check console for details. Make sure your API Key is correct.`;
             } finally {
                 solveButton.disabled = false;
                 explainButton.disabled = false;
