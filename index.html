@@ -350,16 +350,16 @@
             let contents = [];
             const modelName = 'gemini-2.5-flash'; // মডেলের নাম সরাসরি
 
-            // মডেল কনফিগারেশন (গতির জন্য চরম অপটিমাইজেশন)
+            // মডেল কনফিগারেশন (গতির জন্য চরম অপটিমাইজেশন: temperature: 0.0)
             const config = {
                 temperature: 0.0, // সর্বনিম্ন টেম্পারেচার = দ্রুততম, কম সৃজনশীলতা, সরাসরি উত্তর
-                maxOutputTokens: isExplainMode ? 600 : 1500, // সহজ উত্তর ছোট হবে, Solve বড় হবে
+                maxOutputTokens: isExplainMode ? 600 : 1500, // উত্তর ছোট রাখলে দ্রুত আসে
             };
 
 
             if (isExplainMode) {
                 // Easy Explanation এর জন্য আরও কঠোর প্রম্পট
-                prompt = `TASK: You are an expert math tutor. Your goal is to simplify the provided solution. The explanation must be easy to understand for a middle school student, use simple math symbols (*, /, +) only, and be highly efficient.
+                prompt = `TASK: You are an expert math tutor. Your goal is to simplify the provided detailed solution. The explanation must be easy to understand for a middle school student, use simple math symbols (*, /, +) only, and be highly efficient.
                 
                 The original math problem was: ${currentProblem}
                 The detailed solution to simplify is: ${lastDetailedSolution}
@@ -372,7 +372,7 @@
                 // Solve Mode - সমস্যা বোঝা, সহজ চিহ্ন ও দ্রুত উত্তর দেওয়ার জন্য কঠোর প্রম্পট
                 currentProblem = input; 
 
-                const solvePromptBase = `TASK: You are a world-class math solver. Solve the problem completely. It is CRUCIAL to understand the FULL problem before generating the solution. Provide the solution step-by-step. Use simple math symbols (*, /, +) only, avoiding complex LaTeX/MathJax. Solve in under 1500 words for speed. Respond in ${outputLanguage} language.`;
+                const solvePromptBase = `TASK: You are a world-class math solver. Solve the problem completely using the shortest and easiest method (shortcut if possible). It is CRUCIAL to understand the FULL problem before generating the solution. Provide the step-by-step solution. Use simple math symbols (*, /, +) only, avoiding complex LaTeX/MathJax. Solve in under 1500 words for speed. Respond in ${outputLanguage} language.`;
 
                 if (uploadedFile) {
                     currentProblem = `Problem from uploaded file: ${uploadedFile.name}`;
