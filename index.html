@@ -1,8 +1,9 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>100+ Language Math Solver App</title>
     <link rel="icon" type="image/png" href="/favicon.png">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="description" content="Solve math problems in 100+ languages including Bengali, Hindi, & Spanish. Use AI Image Solver to upload photos of homework and get step-by-step explanations.">
@@ -33,22 +34,14 @@
             background-color: #A5B4FC;
             border-radius: 4px;
         }
-    </style> <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-51RHLC2HX5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-51RHLC2HX5');
-</script>
+    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 sm:p-8 font-sans">
 
     <div class="max-w-4xl mx-auto">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-extrabold text-indigo-800 mb-2 drop-shadow-md">100+ Language Math Solver</h1>
-            <p class= "text-xl text-gray-600">Solve complex math problems with text or image in **Bengali, Hindi, & 100+ languages**.</p>
+            <p class="text-xl text-gray-600">Solve complex math problems with text or image in **Bengali, Hindi, & 100+ languages**.</p>
         </header>
 
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl border border-indigo-200/50">
@@ -204,8 +197,7 @@
                         2. Enter Math Problem or Upload Image
                     </label>
                     <textarea
-                        id="mathInput"
-                        rows="5"
+                        id="math-question-input" rows="5"
                         placeholder="Type your math problem here (e.g., 5+5?)."
                         class="w-full p-4 border border-gray-300 rounded-lg shadow-inner focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 text-base"
                     ></textarea>
@@ -243,8 +235,7 @@
                 <div class="space-y-4">
                     <h2 class="text-2xl font-semibold text-indigo-700 border-b pb-2">3. Solution</h2>
 
-                    <div id="output" class="scroll-container bg-gray-50 border border-gray-300 text-gray-800">
-                        Solution will appear here...
+                    <div id="detailed-solution-output" class="scroll-container bg-gray-50 border border-gray-300 text-gray-800"> Solution will appear here...
                     </div>
 
                     <button
@@ -264,6 +255,7 @@
         const GEMINI_API_KEY = "AIzaSyBoKhnvyhOeaY3BLOilcSrDgzMvYc2KB5U"; // <--- আপনার API Key এখানে বসান
         let currentProblem = "";
         let uploadedFile = null;
+        let lastDetailedSolution = ""; // শেষ সঠিক উত্তরটি সেভ করার জন্য
 
         // --- File Handling Functions ---
 
@@ -282,7 +274,7 @@
                 uploadedFile = file;
                 fileNameDisplay.textContent = 'File selected: ' + file.name;
                 clearFileButton.disabled = false;
-                document.getElementById('mathInput').value = 'Please solve the problem in the attached file.';
+                document.getElementById('math-question-input').value = 'Please solve the problem in the attached file.'; // ID ব্যবহার
             } else {
                 clearFile();
             }
@@ -293,7 +285,7 @@
             document.getElementById('fileInput').value = '';
             document.getElementById('fileNameDisplay').textContent = 'No file selected.';
             document.getElementById('clearFileButton').disabled = true;
-            document.getElementById('mathInput').value = '';
+            document.getElementById('math-question-input').value = ''; // ID ব্যবহার
         }
 
         // Converts the file to a Base64 string for the API
@@ -324,8 +316,8 @@
         }
 
         async function solveProblem(isExplainMode) {
-            const input = document.getElementById('mathInput').value.trim();
-            const outputDiv = document.getElementById('output');
+            const input = document.getElementById('math-question-input').value.trim(); // ID ব্যবহার
+            const outputDiv = document.getElementById('detailed-solution-output'); // ID ব্যবহার
             const languageSelect = document.getElementById('outputLanguage');
             const outputLanguage = languageSelect.value;
             const solveButton = document.getElementById('solveButton');
@@ -336,11 +328,13 @@
                 alert("Please enter a math problem or upload an image to solve.");
                 return;
             }
-
-            if (isExplainMode && !currentProblem) {
-                alert("Please solve the initial problem first!");
+            
+            // Explain Mode এ, যদি আগে কোনো সমাধান না থাকে
+            if (isExplainMode && !lastDetailedSolution) { 
+                alert("Please solve the initial problem first to get an explanation!");
                 return;
             }
+
 
             // UI Disable/Enable
             solveButton.disabled = true;
@@ -355,15 +349,21 @@
             let contents = [];
 
             if (isExplainMode) {
-                prompt = `You are an excellent teacher. Simplify the solution for the math problem: "${currentProblem}" (Problem solved previously). Provide the explanation in a simple, step-by-step manner for a middle school student. Respond in ${outputLanguage} language.`;
+                // Easy Explanation এর জন্য অপটিমাইজড প্রম্পট
+                prompt = `You are an expert math tutor. Your task is to simplify the provided solution into a very easy-to-understand explanation for a middle school student. The explanation must be fast, direct, and easy. 
+                
+                The original math problem was: ${currentProblem}
+                The detailed solution to simplify is: ${lastDetailedSolution}
+                
+                Please provide the easier explanation in ${outputLanguage} language.`;
                 contents = [{ role: "user", parts: [{ text: prompt }] }];
             } else {
-                // Solve Mode with or without file
+                // Solve Mode - সমস্যা বোঝা এবং দ্রুত উত্তর দেওয়ার জন্য অপটিমাইজড প্রম্পট
                 currentProblem = input; // Save problem text for explanation
 
                 if (uploadedFile) {
                     currentProblem = `Problem from uploaded file: ${uploadedFile.name}`; // Update for explanation mode
-                    prompt = `You are a world-class math solver. Solve the math problem shown in the attached image/file. Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
+                    prompt = `You are a world-class math solver. Solve the math problem shown in the attached image/file. It is crucial to understand the entire problem before solving. Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
 
                     try {
                         const imagePart = await fileToGenerativePart(uploadedFile);
@@ -377,7 +377,7 @@
                     }
 
                 } else {
-                    prompt = `You are a world-class math solver. Solve the following problem: "${input}". Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
+                    prompt = `You are a world-class math solver. Solve the following problem: "${input}". It is crucial to understand the entire problem before solving. Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
                     contents = [{ role: "user", parts: [{ text: prompt }] }];
                 }
             }
@@ -388,7 +388,13 @@
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: contents }),
+                    body: JSON.stringify({ 
+                        contents: contents, 
+                        config: {
+                            maxOutputTokens: isExplainMode ? 800 : 2048, // সহজ উত্তর ছোট হবে, Solve বড় হবে
+                            temperature: isExplainMode ? 0.2 : 0.1,    // সহজ উত্তরের জন্য একটু বেশি টেম্পারেচার, Solve এর জন্য কম (দ্রুত)
+                        },
+                    }),
                 });
 
                 if (!response.ok) {
@@ -399,6 +405,10 @@
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate a response. Please check your API key or input.";
 
                 outputDiv.innerHTML = text;
+                
+                if (!isExplainMode) {
+                    lastDetailedSolution = text; // সঠিক উত্তরটি সেভ করে রাখা হলো
+                }
 
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
@@ -410,5 +420,14 @@
             }
         }
     </script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-51RHLC2HX5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-51RHLC2HX5');
+</script>
 </body>
 </html>
