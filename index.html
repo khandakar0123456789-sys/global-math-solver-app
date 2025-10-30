@@ -316,8 +316,9 @@
         }
 
         async function solveProblem(isExplainMode) {
-            const input = document.getElementById('math-question-input').value.trim(); // ID ব্যবহার
-            const outputDiv = document.getElementById('detailed-solution-output'); // ID ব্যবহার
+            // ID গুলি নিশ্চিত করুন
+            const input = document.getElementById('math-question-input').value.trim();
+            const outputDiv = document.getElementById('detailed-solution-output');
             const languageSelect = document.getElementById('outputLanguage');
             const outputLanguage = languageSelect.value;
             const solveButton = document.getElementById('solveButton');
@@ -347,23 +348,35 @@
             // Constructing Prompt and Content
             let prompt = "";
             let contents = [];
+            const modelName = 'gemini-2.5-flash'; // মডেলের নাম সরাসরি
+
+            // মডেল কনফিগারেশন (গতির জন্য চরম অপটিমাইজেশন)
+            const config = {
+                temperature: 0.0, // সর্বনিম্ন টেম্পারেচার = দ্রুততম, কম সৃজনশীলতা, সরাসরি উত্তর
+                maxOutputTokens: isExplainMode ? 600 : 1500, // সহজ উত্তর ছোট হবে, Solve বড় হবে
+            };
+
 
             if (isExplainMode) {
-                // Easy Explanation এর জন্য অপটিমাইজড প্রম্পট
-                prompt = `You are an expert math tutor. Your task is to simplify the provided solution into a very easy-to-understand explanation for a middle school student. The explanation must be fast, direct, and easy. 
+                // Easy Explanation এর জন্য আরও কঠোর প্রম্পট
+                prompt = `TASK: You are an expert math tutor. Your goal is to simplify the provided solution. The explanation must be easy to understand for a middle school student, use simple math symbols (*, /, +) only, and be highly efficient.
                 
                 The original math problem was: ${currentProblem}
                 The detailed solution to simplify is: ${lastDetailedSolution}
                 
-                Please provide the easier explanation in ${outputLanguage} language.`;
+                Provide the simplified explanation in ${outputLanguage} language.`;
+                
                 contents = [{ role: "user", parts: [{ text: prompt }] }];
+
             } else {
-                // Solve Mode - সমস্যা বোঝা এবং দ্রুত উত্তর দেওয়ার জন্য অপটিমাইজড প্রম্পট
-                currentProblem = input; // Save problem text for explanation
+                // Solve Mode - সমস্যা বোঝা, সহজ চিহ্ন ও দ্রুত উত্তর দেওয়ার জন্য কঠোর প্রম্পট
+                currentProblem = input; 
+
+                const solvePromptBase = `TASK: You are a world-class math solver. Solve the problem completely. It is CRUCIAL to understand the FULL problem before generating the solution. Provide the solution step-by-step. Use simple math symbols (*, /, +) only, avoiding complex LaTeX/MathJax. Solve in under 1500 words for speed. Respond in ${outputLanguage} language.`;
 
                 if (uploadedFile) {
-                    currentProblem = `Problem from uploaded file: ${uploadedFile.name}`; // Update for explanation mode
-                    prompt = `You are a world-class math solver. Solve the math problem shown in the attached image/file. It is crucial to understand the entire problem before solving. Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
+                    currentProblem = `Problem from uploaded file: ${uploadedFile.name}`;
+                    prompt = `Solve the math problem shown in the attached image/file. ` + solvePromptBase;
 
                     try {
                         const imagePart = await fileToGenerativePart(uploadedFile);
@@ -377,12 +390,12 @@
                     }
 
                 } else {
-                    prompt = `You are a world-class math solver. Solve the following problem: "${input}". It is crucial to understand the entire problem before solving. Provide the solution step-by-step and write the entire response in ${outputLanguage} language.`;
+                    prompt = `Solve the following problem: "${input}". ` + solvePromptBase;
                     contents = [{ role: "user", parts: [{ text: prompt }] }];
                 }
             }
 
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
 
             try {
                 const response = await fetch(API_URL, {
@@ -390,10 +403,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         contents: contents, 
-                        config: {
-                            maxOutputTokens: isExplainMode ? 800 : 2048, // সহজ উত্তর ছোট হবে, Solve বড় হবে
-                            temperature: isExplainMode ? 0.2 : 0.1,    // সহজ উত্তরের জন্য একটু বেশি টেম্পারেচার, Solve এর জন্য কম (দ্রুত)
-                        },
+                        config: config, // নতুন কনফিগারেশন ব্যবহার করা হয়েছে
                     }),
                 });
 
